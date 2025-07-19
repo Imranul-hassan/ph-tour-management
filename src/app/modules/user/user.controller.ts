@@ -1,15 +1,10 @@
-import { Request, Response } from "express";
-import { User } from "./user.model";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes"
+import { UserServices } from "./user.service";
 
-const createUser = async (req: Request, res: Response)=>{
+const createUser = async (req: Request, res: Response, next: NextFunction)=>{
     try{
-        const {name, email} = req.body;
-        const user = await User.create({
-            name,
-            email
-        })
-
+       const user = await UserServices.createUser(req.body)
         res.status(httpStatus.CREATED).json({
             message: "User created successfully",
             user
@@ -17,13 +12,13 @@ const createUser = async (req: Request, res: Response)=>{
 
     }catch(err: any){
         console.log(err);
-        res.status(400).json({
-            message: `Something wrong!! ${err.message}`,
-            err
-        })
+        next(err)
     }
 }
 
 export const UserControllers = {
     createUser
 }
+
+
+//route matching -> controller -> service -> model -> db
