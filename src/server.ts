@@ -3,6 +3,7 @@ import { Server } from "http"
 import mongoose from "mongoose";
 import app from "./app";
 import { envVars } from "./app/config/env";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 
 
 let server: Server;
@@ -16,40 +17,44 @@ const startServer = async () => {
         server = app.listen(envVars.PORT, () => {
             console.log(`Server is listening port ${envVars.PORT}`)
         })
-    } catch (error){
+    } catch (error) {
         console.log(error)
     }
 }
 
-startServer()
+(async () => {
+    await startServer()
+    await seedSuperAdmin()
+})()
 
-process.on("SIGTERM",()=>{
+
+process.on("SIGTERM", () => {
     console.log("SIGTERM signal receive")
 
-    if(server){
-        server.close(()=>{
+    if (server) {
+        server.close(() => {
             process.exit(1);
         });
     }
     process.exit(1)
 })
 
-process.on("unhandledRejection",(err)=>{
+process.on("unhandledRejection", (err) => {
     console.log("Unhandled Rejection Detected", err)
 
-    if(server){
-        server.close(()=>{
+    if (server) {
+        server.close(() => {
             process.exit(1);
         });
     }
     process.exit(1)
 })
 
-process.on("uncaughtException",(err)=>{
+process.on("uncaughtException", (err) => {
     console.log("uncaught Exception detection", err);
 
-    if(server){
-        server.close(()=>{
+    if (server) {
+        server.close(() => {
             process.exit(1);
         });
     }
